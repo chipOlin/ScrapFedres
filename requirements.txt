@@ -2,4 +2,5 @@ schedule~=1.1.0
 requests~=2.28.1
 bs4~=0.0.1
 beautifulsoup4~=4.11.1
-urllib3~=2.0.0a2
+urllib3~=1.26.13
+lxml~=4.9.1
