@@ -1,5 +1,5 @@
 import json
-import os.path
+import os
 import re
 import time
 import telebot
@@ -11,11 +11,9 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 # Input parameters
-API_TOKEN = "TELEGRAM_BOT_TOKEN"
+API_TOKEN = os.environ["TBT"]
 bot = telebot.TeleBot(API_TOKEN)
 regions = {45: "г. Москва", 46: "Московская область"}
-# pub_dt = "26.11.2022"
-pub_dt = datetime.strftime(datetime.now(), '%d.%m.%Y')
 translate = {
     'publication_datetime': 'Дата сообщения',
     'publication_url': 'Ссылка на сообщение',
@@ -26,7 +24,7 @@ translate = {
 }
 
 
-def scrapy_data():
+def scrapy_data(pub_dt):
     files = {}
     for k, v in regions.items():
         cookies = {
@@ -144,7 +142,7 @@ def parse_scrapy_files(scrapy_files):
     return files
 
 
-def parse_json_files(parse_files):
+def parse_json_files(parse_files, pub_dt):
     new_rows = {}
     for reg, file in parse_files.items():
         try:
@@ -183,9 +181,10 @@ def start_schedule():
 
 
 def send_message():
-    scrapy_files = scrapy_data()
+    pub_dt = datetime.strftime(datetime.now(), '%d.%m.%Y')
+    scrapy_files = scrapy_data(pub_dt)
     parse_files = parse_scrapy_files(scrapy_files)
-    add_new_debtors = parse_json_files(parse_files)
+    add_new_debtors = parse_json_files(parse_files, pub_dt)
 
     l_str = []
     for nd in add_new_debtors:
