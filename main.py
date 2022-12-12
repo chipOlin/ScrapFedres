@@ -89,7 +89,7 @@ def scrapy_data(pub_dt):
             adapter = HTTPAdapter(max_retries=retry)
             session.mount('http://', adapter)
             session.mount('https://', adapter)
-            response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data)
+            response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.5)
             # response = requests.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.3)
         except requests.exceptions.ConnectionError as e:
             print(e)
@@ -127,7 +127,7 @@ def parse_scrapy_files(scrapy_files):
             item = {
                 "publication_datetime": table_tr_td[0].get_text().strip(),
                 "publication_url": url + table_tr_td[1].a['href'],
-                "debtor": table_tr_td[2].a.get_text().strip(),
+                "debtor": table_tr_td[2].a.get_text().strip() if table_tr_td[2].a else table_tr_td[2].get_text().strip(),
                 "debtor_card": url + table_tr_td[2].a['href'],
                 "published_by": table_tr_td[4].a.get_text().strip() if table_tr_td[4].a else table_tr_td[
                     4].get_text().strip(),
