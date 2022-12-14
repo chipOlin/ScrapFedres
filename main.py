@@ -26,23 +26,8 @@ translate = {
 
 
 def scrapy_data(pub_dt):
-    files = {}
+    files = []
     for k_mt, v_mt in message_type.items():
-
-<<<<<<< HEAD
-        try:
-            session = requests.Session()
-            retry = Retry(connect=3, backoff_factor=0.5)
-            adapter = HTTPAdapter(max_retries=retry)
-            session.mount('http://', adapter)
-            session.mount('https://', adapter)
-            response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.5)
-            # response = requests.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.3)
-        except requests.exceptions.ConnectionError as e:
-            print(e)
-        except requests.exceptions.ReadTimeout as e:
-            print(e)
-=======
         for k, v in regions.items():
             cookies = {
                 'qrator_ssid': '1669410074.793.k84gZPs0FaTGnxKU-75mhu7cvi1tic0r4vda0uu1cn366pi7d',
@@ -99,7 +84,6 @@ def scrapy_data(pub_dt):
                 'ctl00$cphBody$ibMessagesSearch.x': '51',
                 'ctl00$cphBody$ibMessagesSearch.y': '6',
             }
->>>>>>> e826578 (WIP on dev: ee47acd UPD main.py: add environ for TelegramBot)
 
             try:
                 session = requests.Session()
@@ -107,7 +91,7 @@ def scrapy_data(pub_dt):
                 adapter = HTTPAdapter(max_retries=retry)
                 session.mount('http://', adapter)
                 session.mount('https://', adapter)
-                response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data)
+                response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.5)
                 # response = requests.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.3)
             except requests.exceptions.ConnectionError as e:
                 print(e)
@@ -118,9 +102,9 @@ def scrapy_data(pub_dt):
                 fn = "scrapy_data-" + k_mt + "-" + k + ".html"
                 with open(fn, "w", encoding="utf-8") as f:
                     f.write(response.text)
-                    files[k] = fn
+                    files.append(fn)
 
-                time.sleep(2)
+                time.sleep(1)
             else:
                 print("Запрос на получение данных не прошел")
 
@@ -232,7 +216,7 @@ if __name__ == "__main__":
     # except:
     #     pass
 
-    scrapy_files = scrapy_data("10.12.2022")
+    scrapy_files = scrapy_data("13.12.2022")
     print(scrapy_files)
     # parse_files = parse_scrapy_files(scrapy_files)
     # add_new_debtors = parse_json_files(parse_files)
