@@ -2,3 +2,4 @@
 /.idea
 /db_*
 /scrapy_data-*
+/database/*
