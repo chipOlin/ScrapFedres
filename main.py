@@ -9,11 +9,12 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+import logging
 
 # Input parameters
 API_TOKEN = os.environ["TBT"]
 bot = telebot.TeleBot(API_TOKEN)
-message_type = {"Auction": "Объявление о проведении торгов", "Other": "Иное сообщение"}
+message_types = {"Auction": "Объявление о проведении торгов", "Other": "Иное сообщение"}
 regions = {"45": "г. Москва", "46": "Московская область"}
 translate = {
     'publication_datetime': 'Дата сообщения',
@@ -27,8 +28,8 @@ translate = {
 
 def scrapy_data(pub_dt):
     files = []
-    for k_mt, v_mt in message_type.items():
-        for k, v in regions.items():
+    for key_message_type, value_message_type in message_types.items():
+        for key_region in regions.keys():
             cookies = {
                 'qrator_ssid': '1669410074.793.k84gZPs0FaTGnxKU-75mhu7cvi1tic0r4vda0uu1cn366pi7d',
             }
@@ -61,14 +62,14 @@ def scrapy_data(pub_dt):
                 'ctl00_PrivateOffice1_RadToolTip1_ClientState': '',
                 'ctl00$DebtorSearch1$inputDebtor': 'поиск',
                 'ctl00$cphBody$tbMessageNumber': '',
-                'ctl00$cphBody$mdsMessageType$tbSelectedText': v_mt,
-                'ctl00$cphBody$mdsMessageType$hfSelectedValue': k_mt,
+                'ctl00$cphBody$mdsMessageType$tbSelectedText': value_message_type,
+                'ctl00$cphBody$mdsMessageType$hfSelectedValue': key_message_type,
                 'ctl00$cphBody$mdsMessageType$hfSelectedType': '',
                 'ctl00$cphBody$ddlCourtDecisionType': '',
                 'ctl00$cphBody$mdsPublisher$tbSelectedText': '',
                 'ctl00$cphBody$mdsPublisher$hfSelectedValue': '',
                 'ctl00$cphBody$mdsPublisher$hfSelectedType': '',
-                'ctl00$cphBody$ucRegion$ddlBoundList': k,
+                'ctl00$cphBody$ucRegion$ddlBoundList': key_region,
                 'ctl00$cphBody$mdsDebtor$tbSelectedText': '',
                 'ctl00$cphBody$mdsDebtor$hfSelectedValue': '',
                 'ctl00$cphBody$mdsDebtor$hfSelectedType': '',
@@ -92,14 +93,13 @@ def scrapy_data(pub_dt):
                 session.mount('http://', adapter)
                 session.mount('https://', adapter)
                 response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.5)
-                # response = requests.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.3)
             except requests.exceptions.ConnectionError as e:
                 print(e)
             except requests.exceptions.ReadTimeout as e:
                 print(e)
 
             if response:
-                fn = "scrapy_data-" + k_mt + "-" + k + ".html"
+                fn = "scrapy_data-" + key_message_type + "-" + key_region + ".html"
                 with open(fn, "w", encoding="utf-8") as f:
                     f.write(response.text)
                     files.append(fn)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     # except:
     #     pass
 
-    scrapy_files = scrapy_data("13.12.2022")
+    scrapy_files = scrapy_data("15.12.2022")
     print(scrapy_files)
     # parse_files = parse_scrapy_files(scrapy_files)
     # add_new_debtors = parse_json_files(parse_files)
