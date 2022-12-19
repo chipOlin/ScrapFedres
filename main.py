@@ -91,20 +91,20 @@ def scrapy_data(pub_dt):
             session.mount('https://', adapter)
             response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.5)
             # response = requests.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.3)
+            if response:
+                fn = "scrapy_data-" + str(k) + ".html"
+                with open(fn, "w", encoding="utf-8") as f:
+                    f.write(response.text)
+                    files[k] = fn
+
+                time.sleep(2)
+            else:
+                print("Запрос на получение данных не прошел")
         except requests.exceptions.ConnectionError as e:
             print(e)
         except requests.exceptions.ReadTimeout as e:
             print(e)
 
-        if response:
-            fn = "scrapy_data-" + str(k) + ".html"
-            with open(fn, "w", encoding="utf-8") as f:
-                f.write(response.text)
-                files[k] = fn
-
-            time.sleep(2)
-        else:
-            print("Запрос на получение данных не прошел")
 
     return files
 
