@@ -9,7 +9,6 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
-import logging
 
 # Input parameters
 API_TOKEN = os.environ["TBT"]
@@ -93,21 +92,18 @@ def scrapy_data(pub_dt):
                 session.mount('http://', adapter)
                 session.mount('https://', adapter)
                 response = session.post('https://old.bankrot.fedresurs.ru/Messages.aspx', cookies=cookies, headers=headers, data=data, timeout=0.5)
+                if response:
+                    fn = "scrapy_data-" + key_message_type + "-" + key_region + ".html"
+                    with open(fn, "w", encoding="utf-8") as f:
+                        f.write(response.text)
+                        files.append(fn)
+                    time.sleep(1)
+                else:
+                    print("Запрос на получение данных не прошел")
             except requests.exceptions.ConnectionError as e:
                 print(e)
             except requests.exceptions.ReadTimeout as e:
                 print(e)
-
-            if response:
-                fn = "scrapy_data-" + key_message_type + "-" + key_region + ".html"
-                with open(fn, "w", encoding="utf-8") as f:
-                    f.write(response.text)
-                    files.append(fn)
-
-                time.sleep(1)
-            else:
-                print("Запрос на получение данных не прошел")
-
     return files
 
 
